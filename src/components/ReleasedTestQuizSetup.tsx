@@ -17,10 +17,11 @@ import { BookMarked, Loader2 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const releasedTestQuizSetupSchema = z.object({
-  county: z.string().min(3, "County must be at least 3 characters long."),
+  county: z.string().min(3, "County/Region must be at least 3 characters long."),
   unit: z.string().min(3, "Unit/Subject must be at least 3 characters long."),
-  numQuestions: z.coerce.number().min(1, "Number of questions must be at least 1.").max(20, "Max 20 questions."),
+  numQuestions: z.coerce.number().min(1, "Number of questions must be at least 1.").max(100, "Max 100 questions."),
 });
+
 
 export function ReleasedTestQuizSetup() {
   const router = useRouter();
@@ -49,7 +50,10 @@ export function ReleasedTestQuizSetup() {
             userAnswer: undefined,
             aiExplanation: undefined,
             isCorrect: undefined,
+            hintUsed: false,
+            hintText: undefined,
           })),
+          scoringSystemContext: result.data.scoringSystemContext,
         };
         setCurrentQuiz(newQuiz);
         toast({ title: "Quiz Generated!", description: `Your quiz based on released tests for "${values.unit}" is ready.` });
@@ -71,7 +75,7 @@ export function ReleasedTestQuizSetup() {
           <BookMarked className="w-8 h-8" /> Create Quiz from Released Tests
         </CardTitle>
         <CardDescription className="text-center pt-2">
-          Enter a county and educational unit/subject to find questions from publicly available released tests.
+          Enter a county/region and educational unit/subject to find questions (up to 100) from publicly available released tests. The AI may also include relevant images.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -84,7 +88,7 @@ export function ReleasedTestQuizSetup() {
                 <FormItem>
                   <FormLabel>County/Region</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Los Angeles County, State of Texas" {...field} />
+                    <Input placeholder="e.g., Fairfax County, Virginia; California" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,7 +101,7 @@ export function ReleasedTestQuizSetup() {
                 <FormItem>
                   <FormLabel>Educational Unit/Subject</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Grade 8 Science, AP US History" {...field} />
+                    <Input placeholder="e.g., Grade 8 Science, AP US History, NC EOG Math Grade 5" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,7 +114,7 @@ export function ReleasedTestQuizSetup() {
                 <FormItem>
                   <FormLabel>Number of Questions (approximate)</FormLabel>
                   <FormControl>
-                    <Input type="number" min="1" max="20" {...field} />
+                    <Input type="number" min="1" max="100" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

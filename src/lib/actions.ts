@@ -4,7 +4,8 @@
 import { generateQuiz, type GenerateQuizInput } from "@/ai/flows/generate-quiz";
 import { explainAnswer, type ExplainAnswerInput, type ExplainAnswerOutput } from "@/ai/flows/explain-answer";
 import { generateReleasedTestQuiz, type GenerateReleasedTestQuizInput } from "@/ai/flows/generate-released-test-quiz";
-import type { GenerateQuizOutput } from "@/lib/types"; // Import GenerateQuizOutput from lib/types
+import { generateHint, type GenerateHintInput, type GenerateHintOutput } from "@/ai/flows/generate-hint";
+import type { GenerateQuizOutput } from "@/lib/types"; 
 import { z } from "zod";
 
 export async function handleGenerateQuizAction(
@@ -29,7 +30,7 @@ export async function handleGenerateReleasedTestQuizAction(
   county: string,
   unit: string,
   numQuestions: number
-): Promise<{ success: boolean; data?: GenerateQuizOutput; error?: string }> { // Output type is GenerateQuizOutput
+): Promise<{ success: boolean; data?: GenerateQuizOutput; error?: string }> { 
   const input: GenerateReleasedTestQuizInput = { county, unit, numQuestions };
   try {
     const result = await generateReleasedTestQuiz(input);
@@ -65,5 +66,24 @@ export async function handleExplainAnswerAction(
   } catch (error) {
     console.error("Error explaining answer:", error);
     return { success: false, error: "An unexpected error occurred while fetching the explanation." };
+  }
+}
+
+export async function handleGetHintAction(
+  question: string,
+  options: string[]
+): Promise<{ success: boolean; data?: GenerateHintOutput; error?: string }> {
+  const input: GenerateHintInput = { question, options };
+  try {
+    const result = await generateHint(input);
+    if (result && result.hint) {
+      return { success: true, data: result };
+    } else {
+      return { success: false, error: "AI failed to generate a hint for this question." };
+    }
+  } catch (error)
+  {
+    console.error("Error generating hint:", error);
+    return { success: false, error: "An unexpected error occurred while generating the hint." };
   }
 }

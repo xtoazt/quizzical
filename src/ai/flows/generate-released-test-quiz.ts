@@ -13,8 +13,8 @@ import { GenerateQuizOutputSchema, type GenerateQuizOutput } from '@/lib/types';
 import {z} from 'genkit';
 
 const GenerateReleasedTestQuizInputSchema = z.object({
-  county: z.string().describe('The county, state, or region for which to find released tests. e.g., "Fairfax County, Virginia", "California".'),
-  unit: z.string().describe('The educational unit, subject, or grade level. e.g., "Grade 5 Mathematics", "High School Chemistry", "AP Biology".'),
+  county: z.string().describe('The county, state, or region for which to find released tests. e.g., "Fairfax County, Virginia", "California", "North Carolina".'),
+  unit: z.string().describe('The educational unit, subject, or grade level. e.g., "Grade 5 Mathematics EOG", "High School Chemistry", "AP Biology".'),
   numQuestions: z.number().describe('The desired number of questions for the quiz. The AI will try to match this, but the actual number may vary based on available test content.'),
 });
 export type GenerateReleasedTestQuizInput = z.infer<typeof GenerateReleasedTestQuizInputSchema>;
@@ -29,7 +29,7 @@ export async function generateReleasedTestQuiz(input: GenerateReleasedTestQuizIn
 const prompt = ai.definePrompt({
   name: 'generateReleasedTestQuizPrompt',
   input: {schema: GenerateReleasedTestQuizInputSchema},
-  output: {schema: GenerateQuizOutputSchema}, // Crucial: output structure must match, use imported schema
+  output: {schema: GenerateQuizOutputSchema}, 
   prompt: `You are an expert curriculum developer and test designer. Your task is to find and adapt questions from publicly available released educational tests or past papers for a specific county/region and educational unit/subject.
 
 County/Region: {{county}}
@@ -42,7 +42,9 @@ Instructions:
 3. For each question, ensure it is in a multiple-choice format. If the original question is not multiple-choice, adapt it or find a suitable multiple-choice alternative on the same concept.
 4. Provide 4 distinct answer options for each question.
 5. Clearly indicate the correct answer for each question.
-6. Format the output as a JSON object matching the provided schema. The main key should be "quiz", containing an array of question objects. Each question object must have "question", "options" (an array of 4 strings), and "correctAnswer" (a string matching one of the options).
+6. If questions involve visual elements like charts, diagrams (e.g., triangles in geometry), or maps that are integral to understanding the question, try to find publicly accessible URLs for these images and include them in the 'imageUrl' field for that question. If a direct URL is not possible but a visual is important, provide a clear text description in the 'imageDescription' field.
+7. Format the output as a JSON object matching the provided schema. The main key should be "quiz", containing an array of question objects. Each question object must have "question", "options" (an array of 4 strings), and "correctAnswer" (a string matching one of the options), and optionally "imageUrl" or "imageDescription".
+8. If the source test has a known specific scoring system (e.g., 'scores range from 200-800 like the NC EOG which might report a score such as 540' or 'results are reported in proficiency levels 1-5'), please provide a brief description of this in the 'scoringSystemContext' field of the main quiz object (not per question). If no specific system is commonly known for this exact test, omit this field.
 
 Example of a relevant search query you might internally use: "{{county}} {{unit}} released test questions" or "past papers {{unit}} {{county}}".
 
@@ -56,15 +58,19 @@ const generateReleasedTestQuizFlow = ai.defineFlow(
   {
     name: 'generateReleasedTestQuizFlow',
     inputSchema: GenerateReleasedTestQuizInputSchema,
-    outputSchema: GenerateQuizOutputSchema, // Use imported schema
+    outputSchema: GenerateQuizOutputSchema, 
   },
   async input => {
     const {output} = await prompt(input);
     if (!output || !output.quiz) {
-        // If the AI returns a null/undefined output, or an object without a quiz field,
-        // return an empty quiz to prevent errors.
         return { quiz: [] };
     }
-    return output;
+    // Ensure quiz questions have default image fields if not provided
+    const processedQuiz = output.quiz.map(q => ({
+        ...q,
+        imageUrl: q.imageUrl || undefined,
+        imageDescription: q.imageDescription || undefined,
+    }));
+    return { ...output, quiz: processedQuiz };
   }
 );

@@ -5,24 +5,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { handleGenerateQuizAction } from "@/lib/actions";
-import type { Quiz, GeneratedQuizQuestion } from "@/lib/types";
+import type { Quiz, GeneratedQuizQuestion, QuizSetupFormValues } from "@/lib/types";
+import { quizSetupSchema } from "@/lib/types"; // Import schema from types
 import { Sparkles, Loader2 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-
-const quizSetupSchema = z.object({
-  topic: z.string().min(3, "Topic must be at least 3 characters long."),
-  numQuestions: z.coerce.number().min(1, "Number of questions must be at least 1.").max(20, "Max 20 questions."),
-});
-
-type QuizSetupFormValues = z.infer<typeof quizSetupSchema>;
 
 export function QuizSetup() {
   const router = useRouter();
@@ -34,7 +26,7 @@ export function QuizSetup() {
     resolver: zodResolver(quizSetupSchema),
     defaultValues: {
       topic: "",
-      numQuestions: 5,
+      numQuestions: 10, // Default to 10
     },
   });
 
@@ -50,7 +42,10 @@ export function QuizSetup() {
             userAnswer: undefined,
             aiExplanation: undefined,
             isCorrect: undefined,
+            hintUsed: false,
+            hintText: undefined,
           })),
+          scoringSystemContext: result.data.scoringSystemContext,
         };
         setCurrentQuiz(newQuiz);
         toast({ title: "Quiz Generated!", description: `Your quiz on "${values.topic}" is ready.` });
@@ -66,14 +61,13 @@ export function QuizSetup() {
   };
 
   return (
-    // Removed outer div flex-grow container for better placement within tabs
-    <Card className="w-full shadow-xl"> {/* Max-w is handled by Tabs parent */}
+    <Card className="w-full shadow-xl">
       <CardHeader>
         <CardTitle className="font-headline text-3xl text-center text-primary flex items-center justify-center gap-2">
           <Sparkles className="w-8 h-8" /> Create Quiz by Topic
         </CardTitle>
         <CardDescription className="text-center pt-2">
-          Enter a topic and number of questions to generate a new quiz using AI.
+          Enter a topic and number of questions (up to 100) to generate a new quiz using AI.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -99,7 +93,7 @@ export function QuizSetup() {
                 <FormItem>
                   <FormLabel>Number of Questions</FormLabel>
                   <FormControl>
-                    <Input type="number" min="1" max="20" {...field} />
+                    <Input type="number" min="1" max="100" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

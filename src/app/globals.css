@@ -3,82 +3,82 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif; /* Ensure Inter is primary as per guidelines */
 }
 
 @layer base {
   :root {
     --background: 0 0% 96.1%; /* Light Grey #F5F5F5 */
-    --foreground: 262 50% 15%; /* Dark Purple text */
+    --foreground: 0 0% 13%; /* Dark Grey text #212121 */
     --card: 0 0% 100%; /* White */
-    --card-foreground: 262 50% 15%; /* Dark Purple text */
+    --card-foreground: 0 0% 13%; /* Dark Grey text */
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 262 50% 15%; /* Dark Purple text */
-    --primary: 262 52% 47%; /* Deep Purple #673AB7 */
+    --popover-foreground: 0 0% 13%; /* Dark Grey text */
+    --primary: 207 90% 54%; /* Blue #2196F3 */
     --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 262 30% 90%; /* Lighter Purple */
-    --secondary-foreground: 262 52% 47%; /* Deep Purple text */
+    --secondary: 207 89% 77%; /* Lighter Blue #90CAF9 */
+    --secondary-foreground: 207 90% 40%; /* Darker Blue text for Lighter Blue bg */
     --muted: 0 0% 90%; /* Slightly darker grey */
     --muted-foreground: 0 0% 40%; /* Greyer text */
-    --accent: 174 100% 29%; /* Teal #009688 */
+    --accent: 0 0% 46%; /* Medium Grey #757575 */
     --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 85%; /* Visible border on light grey */
     --input: 0 0% 100%; /* White input background */
-    --ring: 262 52% 47%; /* Deep Purple for focus rings */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --ring: 207 90% 54%; /* Blue for focus rings */
+    --chart-1: 207 80% 50%; /* Adjusted chart colors */
+    --chart-2: 207 70% 60%;
+    --chart-3: 0 0% 50%;
+    --chart-4: 207 60% 70%;
+    --chart-5: 0 0% 60%;
     --radius: 0.5rem;
 
-    /* Sidebar variables adjusted for consistency, though not primary focus */
+    /* Sidebar variables */
     --sidebar-background: 0 0% 100%; /* White sidebar */
-    --sidebar-foreground: 262 50% 15%;
-    --sidebar-primary: 262 52% 47%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 174 100% 29%;
-    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-foreground: 0 0% 13%; /* Dark Grey text */
+    --sidebar-primary: 207 90% 54%; /* Blue */
+    --sidebar-primary-foreground: 0 0% 100%; /* White */
+    --sidebar-accent: 0 0% 46%; /* Medium Grey */
+    --sidebar-accent-foreground: 0 0% 100%; /* White */
     --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 262 52% 47%;
+    --sidebar-ring: 207 90% 54%;
   }
 
   .dark {
-    --background: 262 10% 12%; /* Very dark purple-ish grey */
+    --background: 220 13% 10%; /* Dark blue-grey */
     --foreground: 0 0% 96.1%; /* Light Grey text */
-    --card: 262 10% 15%; /* Darker card */
+    --card: 220 13% 13%; /* Darker card */
     --card-foreground: 0 0% 96.1%;
-    --popover: 262 10% 15%;
+    --popover: 220 13% 13%;
     --popover-foreground: 0 0% 96.1%;
-    --primary: 262 60% 65%; /* Lighter Deep Purple */
-    --primary-foreground: 262 10% 12%; /* Dark text for contrast */
-    --secondary: 262 20% 25%; /* Darker Lighter Purple */
+    --primary: 207 80% 65%; /* Lighter Blue */
+    --primary-foreground: 220 13% 5%; /* Very Dark text for contrast */
+    --secondary: 220 13% 25%; /* Darker Lighter Blue-grey */
     --secondary-foreground: 0 0% 96.1%;
-    --muted: 262 10% 20%; /* Darker muted */
+    --muted: 220 13% 20%; /* Darker muted */
     --muted-foreground: 0 0% 60%;
-    --accent: 174 70% 50%; /* Lighter Teal */
-    --accent-foreground: 174 100% 10%; /* Dark text for contrast */
+    --accent: 0 0% 60%; /* Lighter Grey for dark mode accent */
+    --accent-foreground: 0 0% 10%; /* Dark text for contrast */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 262 10% 25%;
-    --input: 262 10% 20%;
-    --ring: 262 60% 65%; /* Lighter Deep Purple for focus rings */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 220 13% 25%;
+    --input: 220 13% 20%;
+    --ring: 207 80% 65%; /* Lighter Blue for focus rings */
+    --chart-1: 207 70% 55%;
+    --chart-2: 207 60% 65%;
+    --chart-3: 0 0% 70%;
+    --chart-4: 207 50% 75%;
+    --chart-5: 0 0% 80%;
 
-    --sidebar-background: 262 10% 10%;
+    --sidebar-background: 220 13% 8%;
     --sidebar-foreground: 0 0% 96.1%;
-    --sidebar-primary: 262 60% 65%;
-    --sidebar-primary-foreground: 262 10% 12%;
-    --sidebar-accent: 174 70% 50%;
-    --sidebar-accent-foreground: 174 100% 10%;
-    --sidebar-border: 262 10% 25%;
-    --sidebar-ring: 262 60% 65%;
+    --sidebar-primary: 207 80% 65%;
+    --sidebar-primary-foreground: 220 13% 5%;
+    --sidebar-accent: 0 0% 60%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 220 13% 25%;
+    --sidebar-ring: 207 80% 65%;
   }
 }
 

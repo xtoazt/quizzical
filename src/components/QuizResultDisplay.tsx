@@ -1,10 +1,11 @@
+
 "use client";
 
-import type { Quiz, QuizQuestion } from "@/lib/types";
+import type { Quiz } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AITutor } from "@/components/AITutor";
-import { CheckCircle2, XCircle, PercentIcon, MessageSquareText } from "lucide-react";
+import { CheckCircle2, XCircle, PercentIcon, Lightbulb, Info } from "lucide-react";
 import Link from "next/link";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
@@ -20,8 +21,15 @@ export function QuizResultDisplay({ quizResults: initialQuizResults }: QuizResul
   }
 
   const totalQuestions = quizResults.questions.length;
-  const correctAnswers = quizResults.questions.filter(q => q.isCorrect).length;
-  const scorePercentage = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+  
+  let effectiveCorrectAnswers = 0;
+  quizResults.questions.forEach(q => {
+    if (q.isCorrect) {
+      effectiveCorrectAnswers += q.hintUsed ? 0.5 : 1;
+    }
+  });
+  
+  const scorePercentage = totalQuestions > 0 ? (effectiveCorrectAnswers / totalQuestions) * 100 : 0;
 
   const handleExplanationUpdate = (questionIndex: number, explanation: string) => {
     if (quizResults) {
@@ -42,10 +50,23 @@ export function QuizResultDisplay({ quizResults: initialQuizResults }: QuizResul
             Topic: {quizResults.topic}
           </CardDescription>
           <div className="mt-4 text-2xl font-semibold">
-            Your Score: <span className={scorePercentage >= 70 ? "text-green-600" : "text-destructive"}>{correctAnswers} / {totalQuestions} ({scorePercentage.toFixed(0)}%)</span>
+            Your Score: <span className={scorePercentage >= 70 ? "text-green-600" : "text-destructive"}>{effectiveCorrectAnswers} / {totalQuestions} ({scorePercentage.toFixed(0)}%)</span>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
+          {quizResults.scoringSystemContext && (
+            <Card className="mt-2 mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-700">
+              <CardHeader className="pb-2 pt-3">
+                <CardTitle className="text-md flex items-center gap-2 text-blue-700 dark:text-blue-300 font-headline">
+                  <Info className="h-5 w-5" /> Scoring Context
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-blue-600 dark:text-blue-400">{quizResults.scoringSystemContext}</p>
+              </CardContent>
+            </Card>
+          )}
+
           {quizResults.questions.map((q, index) => (
             <Card key={index} className={`p-4 rounded-lg ${q.isCorrect ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10'}`}>
               <div className="flex justify-between items-start">
@@ -56,9 +77,23 @@ export function QuizResultDisplay({ quizResults: initialQuizResults }: QuizResul
                   <XCircle className="h-6 w-6 text-destructive shrink-0 ml-2" />
                 )}
               </div>
+              {q.imageUrl && (
+                <div className="my-2 flex justify-center">
+                  {/* Using a simple img tag here for results, next/image could also be used */}
+                  <img src={q.imageUrl} alt={q.imageDescription || "Question image"} style={{maxWidth: '300px', maxHeight: '200px', objectFit: 'contain'}} className="rounded-md" />
+                </div>
+              )}
+              {q.imageDescription && !q.imageUrl && (
+                <p className="my-1 text-xs text-muted-foreground italic">Visual element: {q.imageDescription}</p>
+              )}
               <p className="text-sm mt-1">Your answer: <span className="font-medium">{q.userAnswer || "Not answered"}</span></p>
               {!q.isCorrect && (
                 <p className="text-sm mt-1">Correct answer: <span className="font-medium text-green-700 dark:text-green-400">{q.correctAnswer}</span></p>
+              )}
+              {q.hintUsed && (
+                <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 mt-1">
+                  <Lightbulb className="h-3 w-3" /> Hint was used for this question.
+                </p>
               )}
               
               {!q.isCorrect && q.userAnswer && (
