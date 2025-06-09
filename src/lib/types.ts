@@ -6,15 +6,15 @@ export const GeneratedQuizQuestionSchema = z.object({
   question: z.string().describe('The quiz question.'),
   options: z.array(z.string()).describe('The possible answers to the question.'),
   correctAnswer: z.string().describe('The correct answer to the question.'),
-  imageUrl: z.string().optional().describe('Optional URL of an image relevant to the question (e.g., a chart or diagram). This may not always be a strictly valid URL if the AI provides a descriptive placeholder.'),
-  imageDescription: z.string().optional().describe('Optional description of the image if URL is not available or for accessibility.'),
+  imageUrl: z.string().nullable().optional().describe('Optional URL of an image relevant to the question (e.g., a chart or diagram). This may not always be a strictly valid URL if the AI provides a descriptive placeholder.'),
+  imageDescription: z.string().nullable().optional().describe('Optional description of the image if URL is not available or for accessibility.'),
 });
 export type GeneratedQuizQuestion = z.infer<typeof GeneratedQuizQuestionSchema>;
 
 // Schema for the overall output of the quiz generation AI flow
 export const GenerateQuizOutputSchema = z.object({
   quiz: z.array(GeneratedQuizQuestionSchema).describe('The generated quiz questions and answers.'),
-  scoringSystemContext: z.string().optional().describe("Optional context about the scoring system of the source test, e.g., 'Scores range from 200-800'."),
+  scoringSystemContext: z.string().nullable().optional().describe("Optional context about the scoring system of the source test, e.g., 'Scores range from 200-800'."),
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 

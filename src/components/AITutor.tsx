@@ -9,6 +9,7 @@ import { handleExplainAnswerAction } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lightbulb, MessageCircle, Send } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label"; // Corrected import
 
 interface AITutorProps {
   question: QuizQuestion;
@@ -28,11 +29,6 @@ export function AITutor({ question, onExplanationFetched, questionIndex }: AITut
       toast({ variant: "destructive", title: "Cannot get explanation", description: "You did not answer this question." });
       return;
     }
-    // Allow fetching explanation even if correct, if user submitted reasoning (though UI might prevent this path)
-    // if (question.isCorrect && !reasoning) {
-    //    toast({ title: "Correct!", description: "No explanation needed for a correct answer." });
-    //   return;
-    // }
 
     setIsLoading(true);
     try {
@@ -59,10 +55,9 @@ export function AITutor({ question, onExplanationFetched, questionIndex }: AITut
     }
   };
   
-  // Automatically fetch general explanation if not already fetched and answer is incorrect and no reasoning submitted yet
   useEffect(() => {
     if (!question.aiExplanation && question.userAnswer && !question.isCorrect && !isLoading && !currentAiExplanation && !submittedReasoning) {
-      fetchExplanation(); // Fetches general explanation
+      fetchExplanation(); 
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question.aiExplanation, question.userAnswer, question.isCorrect, submittedReasoning]);
@@ -76,7 +71,7 @@ export function AITutor({ question, onExplanationFetched, questionIndex }: AITut
   };
 
   if (question.isCorrect) {
-    return null; // Don't show tutor for correct answers
+    return null; 
   }
   
   if (!question.userAnswer) {
@@ -86,7 +81,6 @@ export function AITutor({ question, onExplanationFetched, questionIndex }: AITut
   return (
     <div className="mt-4 space-y-3">
       {!submittedReasoning && !currentAiExplanation && !isLoading && (
-         // Show this button if there's no explanation yet at all (general or specific)
         <Button onClick={() => fetchExplanation()} variant="outline" size="sm" disabled={isLoading}>
            <MessageCircle className="mr-2 h-4 w-4" /> Get AI Explanation
         </Button>
@@ -117,7 +111,7 @@ export function AITutor({ question, onExplanationFetched, questionIndex }: AITut
       )}
       
       {submittedReasoning && (
-        <Card className="mt-2 bg-muted/30 border-gray-300 dark:border-gray-700">
+        <Card className="mt-2 bg-muted/20 border-border/70">
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-sm font-semibold text-foreground">Your Reasoning:</CardTitle>
           </CardHeader>
