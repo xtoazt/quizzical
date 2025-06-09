@@ -1,7 +1,10 @@
+
 "use server";
 
-import { generateQuiz, GenerateQuizInput, GenerateQuizOutput } from "@/ai/flows/generate-quiz";
-import { explainAnswer, ExplainAnswerInput, ExplainAnswerOutput } from "@/ai/flows/explain-answer";
+import { generateQuiz, type GenerateQuizInput } from "@/ai/flows/generate-quiz";
+import { explainAnswer, type ExplainAnswerInput, type ExplainAnswerOutput } from "@/ai/flows/explain-answer";
+import { generateReleasedTestQuiz, type GenerateReleasedTestQuizInput } from "@/ai/flows/generate-released-test-quiz";
+import type { GenerateQuizOutput } from "@/lib/types"; // Import GenerateQuizOutput from lib/types
 import { z } from "zod";
 
 export async function handleGenerateQuizAction(
@@ -14,11 +17,30 @@ export async function handleGenerateQuizAction(
     if (result && result.quiz && result.quiz.length > 0) {
       return { success: true, data: result };
     } else {
-      return { success: false, error: "AI failed to generate a quiz. Please try again." };
+      return { success: false, error: "AI failed to generate a quiz for this topic. Please try a different topic or adjust the number of questions." };
     }
   } catch (error) {
-    console.error("Error generating quiz:", error);
-    return { success: false, error: "An unexpected error occurred while generating the quiz." };
+    console.error("Error generating topic quiz:", error);
+    return { success: false, error: "An unexpected error occurred while generating the topic-based quiz." };
+  }
+}
+
+export async function handleGenerateReleasedTestQuizAction(
+  county: string,
+  unit: string,
+  numQuestions: number
+): Promise<{ success: boolean; data?: GenerateQuizOutput; error?: string }> { // Output type is GenerateQuizOutput
+  const input: GenerateReleasedTestQuizInput = { county, unit, numQuestions };
+  try {
+    const result = await generateReleasedTestQuiz(input);
+    if (result && result.quiz && result.quiz.length > 0) {
+      return { success: true, data: result };
+    } else {
+      return { success: false, error: "AI could not find or generate a quiz from released tests for the given county and unit. Please check your inputs or try broader terms." };
+    }
+  } catch (error) {
+    console.error("Error generating released test quiz:", error);
+    return { success: false, error: "An unexpected error occurred while generating the quiz from released tests." };
   }
 }
 
@@ -27,14 +49,11 @@ export async function handleExplainAnswerAction(
   userAnswer: string,
   correctAnswer: string
 ): Promise<{ success: boolean; data?: ExplainAnswerOutput; error?: string }> {
-  // The AI flow `explainAnswer` requires an 'explanation' field.
-  // Since we don't have a pre-existing explanation, we'll pass a placeholder.
-  // The AI might still be able to generate a useful explanation based on other inputs.
   const input: ExplainAnswerInput = {
     question,
     answer: userAnswer,
     correctAnswer,
-    explanation: `The correct answer is ${correctAnswer}. Please elaborate on this topic.`, // Placeholder explanation
+    explanation: `The correct answer is ${correctAnswer}. Please elaborate on this topic, explaining why the user's answer was incorrect (if applicable) and why the correct answer is indeed correct.`,
   };
   try {
     const result = await explainAnswer(input);
