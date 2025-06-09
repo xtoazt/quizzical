@@ -2,10 +2,10 @@
 "use server";
 
 import { generateQuiz, type GenerateQuizInput } from "@/ai/flows/generate-quiz";
-import { explainAnswer, type ExplainAnswerInput, type ExplainAnswerOutput } from "@/ai/flows/explain-answer";
+import { explainAnswer, type ExplainAnswerInput, type ExplainAnswerOutput } from "@/ai/flows/explain-answer"; // Updated import for new schema location
 import { generateReleasedTestQuiz, type GenerateReleasedTestQuizInput } from "@/ai/flows/generate-released-test-quiz";
 import { generateHint, type GenerateHintInput, type GenerateHintOutput } from "@/ai/flows/generate-hint";
-import type { GenerateQuizOutput } from "@/lib/types"; 
+import type { GenerateQuizOutput } from "@/lib/types";
 import { z } from "zod";
 
 export async function handleGenerateQuizAction(
@@ -30,7 +30,7 @@ export async function handleGenerateReleasedTestQuizAction(
   county: string,
   unit: string,
   numQuestions: number
-): Promise<{ success: boolean; data?: GenerateQuizOutput; error?: string }> { 
+): Promise<{ success: boolean; data?: GenerateQuizOutput; error?: string }> {
   const input: GenerateReleasedTestQuizInput = { county, unit, numQuestions };
   try {
     const result = await generateReleasedTestQuiz(input);
@@ -46,15 +46,16 @@ export async function handleGenerateReleasedTestQuizAction(
 }
 
 export async function handleExplainAnswerAction(
-  question: string,
+  questionText: string, // Renamed for clarity
   userAnswer: string,
-  correctAnswer: string
+  correctAnswer: string,
+  userReasoning?: string // Optional user reasoning
 ): Promise<{ success: boolean; data?: ExplainAnswerOutput; error?: string }> {
   const input: ExplainAnswerInput = {
-    question,
+    question: questionText,
     answer: userAnswer,
     correctAnswer,
-    explanation: `The correct answer is ${correctAnswer}. Please elaborate on this topic, explaining why the user's answer was incorrect (if applicable) and why the correct answer is indeed correct.`,
+    userReasoning, // Pass it to the AI flow
   };
   try {
     const result = await explainAnswer(input);

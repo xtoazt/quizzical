@@ -26,6 +26,7 @@ export interface QuizQuestion extends GeneratedQuizQuestion {
   isCorrect?: boolean;
   hintUsed?: boolean;
   hintText?: string;
+  userSubmittedReasoning?: string; // To store user's reasoning
 }
 
 export interface Quiz {
@@ -61,3 +62,16 @@ export const GenerateHintOutputSchema = z.object({
 });
 export type GenerateHintOutput = z.infer<typeof GenerateHintOutputSchema>;
 
+// Schema for explaining an answer (updated)
+export const ExplainAnswerInputSchema = z.object({
+  question: z.string().describe('The quiz question.'),
+  answer: z.string().describe('The user\'s answer to the question.'),
+  correctAnswer: z.string().describe('The correct answer to the question.'),
+  userReasoning: z.string().optional().describe('The user\'s reasoning for their incorrect answer.'),
+});
+export type ExplainAnswerInput = z.infer<typeof ExplainAnswerInputSchema>;
+
+export const ExplainAnswerOutputSchema = z.object({
+  explanation: z.string().describe('The AI tutor\'s explanation.'),
+});
+export type ExplainAnswerOutput = z.infer<typeof ExplainAnswerOutputSchema>;

@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Quiz } from "@/lib/types";
+import type { Quiz, QuizQuestion } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AITutor } from "@/components/AITutor";
@@ -31,10 +31,18 @@ export function QuizResultDisplay({ quizResults: initialQuizResults }: QuizResul
   
   const scorePercentage = totalQuestions > 0 ? (effectiveCorrectAnswers / totalQuestions) * 100 : 0;
 
-  const handleExplanationUpdate = (questionIndex: number, explanation: string) => {
+  const handleExplanationUpdate = (questionIndex: number, explanation: string, userSubmittedReasoning?: string) => {
     if (quizResults) {
-      const updatedQuestions = [...quizResults.questions];
-      updatedQuestions[questionIndex].aiExplanation = explanation;
+      const updatedQuestions = quizResults.questions.map((q, idx) => {
+        if (idx === questionIndex) {
+          return {
+            ...q,
+            aiExplanation: explanation,
+            userSubmittedReasoning: userSubmittedReasoning || q.userSubmittedReasoning, // Persist reasoning
+          };
+        }
+        return q;
+      });
       setQuizResults({ ...quizResults, questions: updatedQuestions });
     }
   };
@@ -79,7 +87,6 @@ export function QuizResultDisplay({ quizResults: initialQuizResults }: QuizResul
               </div>
               {q.imageUrl && (
                 <div className="my-2 flex justify-center">
-                  {/* Using a simple img tag here for results, next/image could also be used */}
                   <img src={q.imageUrl} alt={q.imageDescription || "Question image"} style={{maxWidth: '300px', maxHeight: '200px', objectFit: 'contain'}} className="rounded-md" />
                 </div>
               )}
