@@ -108,4 +108,17 @@ export const SolveQuestionOutputSchema = z.object({
 });
 export type SolveQuestionOutput = z.infer<typeof SolveQuestionOutputSchema>;
 
-    
+// Types for Dashboard
+export interface RecentActivityItem {
+  id: string;
+  type: 'quiz' | 'study' | 'solve';
+  description: string;
+  timestamp: number;
+  icon?: React.ElementType; // For Lucide icons
+}
+
+export const StudyGoalSchema = z.object({
+  text: z.string().max(200, "Goal should be concise (max 200 chars).").optional(),
+  lastUpdated: z.number().optional(),
+});
+export type StudyGoal = z.infer<typeof StudyGoalSchema>;

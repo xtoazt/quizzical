@@ -1,6 +1,6 @@
 
 "use client";
-import { BookOpenText, LayoutDashboard, MessageSquareText, CheckSquare, Sparkles, Palette, Settings } from 'lucide-react';
+import { BookOpenText, LayoutDashboard, MessageSquareText, CheckSquare, Sparkles, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import {
@@ -14,54 +14,23 @@ import {
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useEffect } from 'react';
 
-// Helper function to apply theme
-function applyUpdatedTheme(themeValue: string) {
-  const root = window.document.documentElement;
-  // Define all base theme names that are applied as classes
-  const baseThemes = ['theme-blue', 'theme-purple', 'theme-green', 'theme-mocha', 'theme-mono-light', 'theme-mono-dark'];
-  // Remove all base themes and the main 'dark' class to start fresh
-  root.classList.remove(...baseThemes, 'dark');
-
-  if (themeValue === 'system') {
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (systemPrefersDark) {
-      root.classList.add('dark');
-      root.classList.add('theme-blue'); // Default system dark theme base
-    } else {
-      root.classList.add('theme-blue'); // Default system light theme base
-    }
-  } else {
-    // themeValue could be "theme-purple" (light), "dark theme-blue" (dark), or "theme-mono-dark" (dark by itself)
-    
-    if (themeValue.includes('dark')) { // True for "dark theme-blue" and "theme-mono-dark"
-      root.classList.add('dark'); // Apply the global .dark class
-      
-      // Extract the base theme name.
-      // For "dark theme-blue", themeName becomes "theme-blue".
-      // For "theme-mono-dark", themeName remains "theme-mono-dark" (as replace does nothing).
-      const themeName = themeValue.replace('dark ', ''); 
-      if (baseThemes.includes(themeName)) { // Ensure it's a known base theme
-        root.classList.add(themeName);
-      }
-    } else { 
-      // This is for light themes like "theme-blue", "theme-purple", "theme-mono-light"
-      if (baseThemes.includes(themeValue)) { // Ensure it's a known base theme
-         root.classList.add(themeValue);
-      }
-    }
-  }
-}
-
+// RootLayout is now responsible for applying the theme from localStorage.
+// AppHeader just sets the theme value in localStorage.
 
 export function AppHeader() {
   const [theme, setTheme] = useLocalStorage<string>('theme', 'system');
 
+  // This useEffect is to ensure that if the theme is changed programmatically 
+  // or by another component, this component's state reflects it.
+  // The actual application of the theme to the DOM is handled by RootLayout.
   useEffect(() => {
-    applyUpdatedTheme(theme);
+    // No direct DOM manipulation here. RootLayout handles it.
+    // This effect could be used if AppHeader needed to react to theme changes
+    // for its own internal styling, but it doesn't currently.
   }, [theme]);
 
   const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
+    setTheme(newTheme); // This updates localStorage and triggers RootLayout's effect
   };
 
   return (

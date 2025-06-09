@@ -1,39 +1,44 @@
 
-"use client"; // Required for useEffect and localStorage access
+"use client"; 
 
 import { useEffect, useState } from 'react';
-import type { Metadata } from 'next'; // Metadata can still be used but might be static
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Inter } from 'next/font/google';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { UserNamePromptDialog } from '@/components/UserNamePromptDialog';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-// Static metadata for now, as dynamic metadata from client component is complex
-// export const metadata: Metadata = {
-// title: 'QuizzicalAI',
-// description: 'AI Powered Quiz Generator and Tutor',
-// };
-
 // Helper function to apply theme
-function applyTheme(theme: string) {
+function applyThemeToDocument(themeValue: string | null) {
   const root = window.document.documentElement;
-  root.classList.remove('theme-blue', 'theme-purple', 'theme-green', 'theme-mocha', 'theme-mono-light', 'theme-mono-dark', 'dark');
-  
-  if (theme === 'system') {
+  const baseThemes = ['theme-blue', 'theme-purple', 'theme-green', 'theme-mocha', 'theme-mono-light', 'theme-mono-dark'];
+  root.classList.remove(...baseThemes, 'dark');
+
+  if (!themeValue || themeValue === 'system') {
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (systemPrefersDark) {
-      root.classList.add('dark'); // Apply general dark mode
-      // Optionally, apply a default dark theme like 'theme-blue' or 'theme-mono-dark'
-      root.classList.add('theme-blue'); // Default to blue for system dark
+      root.classList.add('dark');
+      root.classList.add('theme-blue'); // Default system dark
     } else {
-      root.classList.add('theme-blue'); // Default to blue for system light
+      root.classList.add('theme-blue'); // Default system light
     }
-  } else if (theme.includes('dark')) {
-    root.classList.add('dark');
-    root.classList.add(theme);
   } else {
-    root.classList.add(theme);
+    if (themeValue.includes('dark ')) { // e.g., "dark theme-blue"
+      root.classList.add('dark');
+      const baseThemeName = themeValue.split(' ')[1]; // "theme-blue"
+      if (baseThemes.includes(baseThemeName)) {
+        root.classList.add(baseThemeName);
+      }
+    } else if (baseThemes.includes(themeValue)) { // e.g., "theme-mono-dark" or "theme-purple"
+      if (themeValue.includes('mono-dark')) { // Special case for standalone dark theme
+          root.classList.add('dark');
+      }
+      root.classList.add(themeValue);
+    } else {
+        root.classList.add('theme-blue'); // Fallback
+    }
   }
 }
 
@@ -44,13 +49,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [mounted, setMounted] = useState(false);
+  const [theme] = useLocalStorage<string>('theme', 'system');
+  const [userName, setUserName] = useLocalStorage<string | null>('quizzicalai_userName', null);
+  const [isNamePromptOpen, setIsNamePromptOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const storedTheme = localStorage.getItem('theme') || 'system';
-    applyTheme(storedTheme);
   }, []);
+  
+  useEffect(() => {
+    if (mounted) {
+      applyThemeToDocument(theme);
+    }
+  }, [theme, mounted]);
 
+  useEffect(() => {
+    if (mounted && !userName) {
+      setIsNamePromptOpen(true);
+    }
+  }, [mounted, userName]);
 
   // This effect listens to localStorage changes from other tabs/windows for theme
   useEffect(() => {
@@ -58,34 +75,44 @@ export default function RootLayout({
 
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'theme' && event.newValue) {
-        applyTheme(event.newValue);
+        applyThemeToDocument(event.newValue);
+      }
+      if (event.key === 'quizzicalai_userName' && event.newValue) {
+        setUserName(event.newValue ? JSON.parse(event.newValue) : null);
       }
     };
     window.addEventListener('storage', handleStorageChange);
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [mounted]);
+  }, [mounted, setUserName]);
   
   if (!mounted) {
-      // To prevent FOUC (Flash of Unstyled Content) or theme flicker,
-      // you might return null or a basic loading skeleton until theme is applied.
-      // However, for simplicity, we'll render children, but theme might briefly flicker.
-      // A script in <head> is the most robust way to prevent flicker, but harder with app router's server components.
+      return null; 
   }
+
+  const handleNameSave = (name: string) => {
+    setUserName(name);
+    setIsNamePromptOpen(false);
+  };
 
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
         <title>QuizzicalAI</title>
         <meta name="description" content="AI Powered Quiz Generator and Tutor" />
+        {/* Favicon link would go here, e.g., <link rel="icon" href="/favicon.ico" /> */}
+        {/* For now, I will not add a placeholder favicon as I cannot generate image files */}
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
         {children}
         <Toaster />
+        <UserNamePromptDialog 
+          isOpen={isNamePromptOpen} 
+          onClose={() => setIsNamePromptOpen(false)} // Or handle it differently if name is mandatory
+          onSave={handleNameSave} 
+        />
       </body>
     </html>
   );
 }
-
-    

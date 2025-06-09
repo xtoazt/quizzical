@@ -8,6 +8,8 @@ import { AITutor } from "@/components/AITutor";
 import { CheckCircle2, XCircle, PercentIcon, Lightbulb, Info } from "lucide-react";
 import Link from "next/link";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useRecentActivity } from "@/hooks/useRecentActivity"; // Import the hook
+import { useEffect } from "react";
 
 interface QuizResultDisplayProps {
   quizResults: Quiz;
@@ -15,6 +17,16 @@ interface QuizResultDisplayProps {
 
 export function QuizResultDisplay({ quizResults: initialQuizResults }: QuizResultDisplayProps) {
   const [quizResults, setQuizResults] = useLocalStorage<Quiz | null>("quizzicalai_currentQuiz", initialQuizResults);
+  const { addActivity } = useRecentActivity(); // Get the addActivity function
+
+  // Log activity when component mounts with valid results
+  useEffect(() => {
+    if (quizResults && quizResults.topic) {
+      addActivity('quiz', `Completed quiz on "${quizResults.topic}"`);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
+
 
   if (!quizResults || !quizResults.questions) {
     return <p>No quiz results found.</p>;
@@ -111,7 +123,7 @@ export function QuizResultDisplay({ quizResults: initialQuizResults }: QuizResul
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button asChild variant="default">
-            <Link href="/">Take Another Quiz</Link>
+            <Link href="/create-quiz">Take Another Quiz</Link>
           </Button>
         </CardFooter>
       </Card>

@@ -14,7 +14,9 @@ import { useToast } from "@/hooks/use-toast";
 import { handleStudyChatMessageAction } from "@/lib/actions";
 import { Loader2, Send, Lightbulb, Bot, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { ChatMessage as ChatMessageType } from "@/lib/types"; // Renamed to avoid conflict
+import type { ChatMessage as ChatMessageType } from "@/lib/types";
+import { useRecentActivity } from "@/hooks/useRecentActivity"; // Import the hook
+
 
 const messageFormSchema = z.object({
   userMessage: z.string().min(1, "Message cannot be empty.").max(1000, "Message too long."),
@@ -34,6 +36,9 @@ export function StudyChatbot() {
   const [currentTopic, setCurrentTopic] = useState<string>("");
   const [isTopicSet, setIsTopicSet] = useState<boolean>(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { addActivity } = useRecentActivity(); // Get the addActivity function
+  const [hasLoggedStudySession, setHasLoggedStudySession] = useState(false);
+
 
   const topicForm = useForm<TopicFormValues>({
     resolver: zodResolver(topicFormSchema),
@@ -59,6 +64,7 @@ export function StudyChatbot() {
     setCurrentTopic(values.topic);
     setIsTopicSet(true);
     setChatHistory([]); 
+    setHasLoggedStudySession(false); // Reset for new topic
     toast({ title: "Topic Set!", description: `AI Tutor is ready to help you with "${values.topic}".` });
   };
 
@@ -69,13 +75,21 @@ export function StudyChatbot() {
     }
     
     const newUserMessage: ChatMessageType = { role: "user", content: values.userMessage };
-    const updatedChatHistory = [...chatHistory, newUserMessage];
-    setChatHistory(updatedChatHistory);
+    // Pass the current chatHistory (before adding the new user message) to the AI.
+    // The AI will use this context. Then, we update the displayed history with both messages.
+    const historyForAI = [...chatHistory]; 
+    setChatHistory(prev => [...prev, newUserMessage]);
     messageForm.reset();
     setIsLoading(true);
 
     try {
-      const result = await handleStudyChatMessageAction(currentTopic, values.userMessage, updatedChatHistory);
+      // Log study session on first message for a new topic
+      if (!hasLoggedStudySession) {
+        addActivity('study', `Started studying "${currentTopic}"`);
+        setHasLoggedStudySession(true);
+      }
+
+      const result = await handleStudyChatMessageAction(currentTopic, values.userMessage, historyForAI);
       if (result.success && result.data?.aiResponseMessage) {
         const aiResponse: ChatMessageType = { role: "model", content: result.data.aiResponseMessage };
         setChatHistory(prev => [...prev, aiResponse]);
@@ -188,7 +202,7 @@ export function StudyChatbot() {
               </form>
             </Form>
           </CardFooter>
-           <Button variant="link" size="sm" onClick={() => { setIsTopicSet(false); setCurrentTopic(""); setChatHistory([]); topicForm.reset(); }} className="mt-0 mb-2 mx-auto text-xs">
+           <Button variant="link" size="sm" onClick={() => { setIsTopicSet(false); setCurrentTopic(""); setChatHistory([]); topicForm.reset(); setHasLoggedStudySession(false); }} className="mt-0 mb-2 mx-auto text-xs">
               Change Topic
             </Button>
         </>
@@ -196,5 +210,3 @@ export function StudyChatbot() {
     </Card>
   );
 }
-
-    

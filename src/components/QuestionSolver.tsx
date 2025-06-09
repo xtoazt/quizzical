@@ -14,6 +14,8 @@ import { handleSolveQuestionAction } from "@/lib/actions";
 import type { SolveQuestionOutput } from "@/lib/types";
 import { Loader2, CheckSquare, Brain, Sparkles } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useRecentActivity } from "@/hooks/useRecentActivity"; // Import the hook
+
 
 const solverFormSchema = z.object({
   questionText: z.string().min(10, "Question must be at least 10 characters.").max(5000, "Question is too long (max 5000 chars)."),
@@ -24,6 +26,8 @@ export function QuestionSolver() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [solution, setSolution] = useState<SolveQuestionOutput | null>(null);
+  const { addActivity } = useRecentActivity(); // Get the addActivity function
+
 
   const form = useForm<SolverFormValues>({
     resolver: zodResolver(solverFormSchema),
@@ -39,6 +43,7 @@ export function QuestionSolver() {
       const result = await handleSolveQuestionAction(values.questionText);
       if (result.success && result.data) {
         setSolution(result.data);
+        addActivity('solve', `Solved a question starting with: "${values.questionText.substring(0, 30)}..."`);
         toast({ title: "Solution Generated!", icon: <Sparkles className="h-5 w-5 text-yellow-400" /> });
       } else {
         toast({ variant: "destructive", title: "Error", description: result.error || "Failed to solve the question." });
