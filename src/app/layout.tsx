@@ -50,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [mounted, setMounted] = useState(false);
-  const [theme, setThemeInStorage] = useLocalStorage<string>('theme', 'system'); // Renamed to avoid conflict
+  const [theme] = useLocalStorage<string>('theme', 'system'); // Removed setThemeInStorage as it's not directly used here for setting
   const [userName, setUserName] = useLocalStorage<string | null>('quizzicalai_userName', null);
   const [isNamePromptOpen, setIsNamePromptOpen] = useState(false);
 
@@ -70,35 +70,14 @@ export default function RootLayout({
     }
   }, [mounted, userName]);
 
-  // This effect listens to localStorage changes from other tabs/windows for theme
-  useEffect(() => {
-    if (!mounted) return;
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'theme' && event.newValue) {
-        // Update the theme state which will trigger the applyThemeToDocument effect
-        setThemeInStorage(event.newValue);
-      }
-      if (event.key === 'quizzicalai_userName' && event.newValue) {
-        setUserName(event.newValue ? JSON.parse(event.newValue) : null);
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [mounted, setUserName, setThemeInStorage]);
+  // Removed the redundant storage listener for 'theme' and 'quizzicalai_userName'
+  // as useLocalStorage now handles its own cross-tab/window synchronization.
   
 
   const handleNameSave = (name: string) => {
     setUserName(name);
     setIsNamePromptOpen(false);
   };
-
-  // The RootLayout must always return <html> and <body> tags.
-  // The `if (!mounted) { return null; }` check was removed.
-  // Client-side only logic (like dialogs or theme application) is handled
-  // within useEffect or by conditional rendering *inside* the body.
 
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
@@ -109,13 +88,8 @@ export default function RootLayout({
         {/* For now, I will not add a placeholder favicon as I cannot generate image files */}
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
-        {/* Conditionally render children or a loader based on 'mounted' if necessary,
-            but the main structure must always be present.
-            For now, just rendering children directly is fine, hydration warnings are suppressed.
-        */}
         {children}
         <Toaster />
-        {/* UserNamePromptDialog is client-side, its visibility is controlled by state */}
         {mounted && (
             <UserNamePromptDialog
                 isOpen={isNamePromptOpen}
