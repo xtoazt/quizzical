@@ -2,9 +2,11 @@
 "use server";
 
 import { generateQuiz, type GenerateQuizInput } from "@/ai/flows/generate-quiz";
-import { explainAnswer, type ExplainAnswerInput, type ExplainAnswerOutput } from "@/ai/flows/explain-answer"; // Updated import for new schema location
+import { explainAnswer, type ExplainAnswerInput, type ExplainAnswerOutput } from "@/ai/flows/explain-answer";
 import { generateReleasedTestQuiz, type GenerateReleasedTestQuizInput } from "@/ai/flows/generate-released-test-quiz";
 import { generateHint, type GenerateHintInput, type GenerateHintOutput } from "@/ai/flows/generate-hint";
+import { studyChat, type StudyChatInput, type StudyChatOutput } from "@/ai/flows/study-chat-flow";
+import { solveQuestion, type SolveQuestionInput, type SolveQuestionOutput } from "@/ai/flows/solve-question-flow";
 import type { GenerateQuizOutput } from "@/lib/types";
 import { z } from "zod";
 
@@ -18,7 +20,7 @@ export async function handleGenerateQuizAction(
     if (result && result.quiz && result.quiz.length > 0) {
       return { success: true, data: result };
     } else {
-      return { success: false, error: "AI failed to generate a quiz for this topic. Please try a different topic or adjust the number of questions." };
+      return { success: false, error: result?.scoringSystemContext || "AI failed to generate a quiz for this topic. Please try a different topic or adjust the number of questions." };
     }
   } catch (error) {
     console.error("Error generating topic quiz:", error);
@@ -37,7 +39,7 @@ export async function handleGenerateReleasedTestQuizAction(
     if (result && result.quiz && result.quiz.length > 0) {
       return { success: true, data: result };
     } else {
-      return { success: false, error: "AI could not find or generate a quiz from released tests for the given county and unit. Please check your inputs or try broader terms." };
+       return { success: false, error: result?.scoringSystemContext || "AI could not find or generate a quiz from released tests. Please check your inputs or try broader terms." };
     }
   } catch (error) {
     console.error("Error generating released test quiz:", error);
@@ -46,16 +48,16 @@ export async function handleGenerateReleasedTestQuizAction(
 }
 
 export async function handleExplainAnswerAction(
-  questionText: string, // Renamed for clarity
+  questionText: string, 
   userAnswer: string,
   correctAnswer: string,
-  userReasoning?: string // Optional user reasoning
+  userReasoning?: string 
 ): Promise<{ success: boolean; data?: ExplainAnswerOutput; error?: string }> {
   const input: ExplainAnswerInput = {
     question: questionText,
     answer: userAnswer,
     correctAnswer,
-    userReasoning, // Pass it to the AI flow
+    userReasoning, 
   };
   try {
     const result = await explainAnswer(input);
@@ -86,5 +88,40 @@ export async function handleGetHintAction(
   {
     console.error("Error generating hint:", error);
     return { success: false, error: "An unexpected error occurred while generating the hint." };
+  }
+}
+
+export async function handleStudyChatMessageAction(
+  topic: string,
+  currentUserMessage: string
+): Promise<{ success: boolean; data?: StudyChatOutput; error?: string }> {
+  const input: StudyChatInput = { topic, currentUserMessage };
+  try {
+    const result = await studyChat(input);
+    if (result && result.aiResponseMessage) {
+      return { success: true, data: result };
+    } else {
+      return { success: false, error: "AI tutor could not respond. Please try again." };
+    }
+  } catch (error) {
+    console.error("Error in study chat:", error);
+    return { success: false, error: "An unexpected error occurred with the AI tutor." };
+  }
+}
+
+export async function handleSolveQuestionAction(
+  questionText: string
+): Promise<{ success: boolean; data?: SolveQuestionOutput; error?: string }> {
+  const input: SolveQuestionInput = { questionText };
+  try {
+    const result = await solveQuestion(input);
+    if (result && result.solution) {
+      return { success: true, data: result };
+    } else {
+      return { success: false, error: "AI could not solve the question. Please ensure it's clearly phrased." };
+    }
+  } catch (error) {
+    console.error("Error solving question:", error);
+    return { success: false, error: "An unexpected error occurred while solving the question." };
   }
 }

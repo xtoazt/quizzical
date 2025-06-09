@@ -6,15 +6,15 @@ export const GeneratedQuizQuestionSchema = z.object({
   question: z.string().describe('The quiz question.'),
   options: z.array(z.string()).describe('The possible answers to the question.'),
   correctAnswer: z.string().describe('The correct answer to the question.'),
-  imageUrl: z.string().nullable().optional().describe('Optional URL of an image relevant to the question (e.g., a chart or diagram). This may not always be a strictly valid URL if the AI provides a descriptive placeholder.'),
-  imageDescription: z.string().nullable().optional().describe('Optional description of the image if URL is not available or for accessibility.'),
+  imageUrl: z.string().nullable().optional().describe('Optional URL of an image relevant to the question. Can be null or missing.'),
+  imageDescription: z.string().nullable().optional().describe('Optional description of the image. Can be null or missing.'),
 });
 export type GeneratedQuizQuestion = z.infer<typeof GeneratedQuizQuestionSchema>;
 
 // Schema for the overall output of the quiz generation AI flow
 export const GenerateQuizOutputSchema = z.object({
   quiz: z.array(GeneratedQuizQuestionSchema).describe('The generated quiz questions and answers.'),
-  scoringSystemContext: z.string().nullable().optional().describe("Optional context about the scoring system of the source test, e.g., 'Scores range from 200-800'."),
+  scoringSystemContext: z.string().nullable().optional().describe("Optional context about the scoring system. Can be null or missing."),
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
@@ -26,17 +26,17 @@ export interface QuizQuestion extends GeneratedQuizQuestion {
   isCorrect?: boolean;
   hintUsed?: boolean;
   hintText?: string;
-  userSubmittedReasoning?: string; // To store user's reasoning
+  userSubmittedReasoning?: string; 
 }
 
 export interface Quiz {
   topic: string;
   questions: QuizQuestion[];
-  scoringSystemContext?: string;
+  scoringSystemContext?: string | null; // Allow null from AI
 }
 
 // For the new ReleasedTestQuizSetup form
-const releasedTestQuizSetupSchema = z.object({
+export const releasedTestQuizSetupSchema = z.object({
   county: z.string().min(3, "County/Region must be at least 3 characters long."),
   unit: z.string().min(3, "Unit/Subject must be at least 3 characters long."),
   numQuestions: z.coerce.number().min(1, "Number of questions must be at least 1.").max(100, "Max 100 questions."),
@@ -45,7 +45,7 @@ export type ReleasedTestQuizSetupFormValues = z.infer<typeof releasedTestQuizSet
 
 // Schema for the QuizSetup form by topic
 export const quizSetupSchema = z.object({
-  topic: z.string().min(3, "Topic must be at least 3 characters long."),
+  topic: z.string().min(3, "Topic must be at least 3 characters long.").max(100, "Topic cannot exceed 100 characters."),
   numQuestions: z.coerce.number().min(1, "Number of questions must be at least 1.").max(100, "Max 100 questions."),
 });
 export type QuizSetupFormValues = z.infer<typeof quizSetupSchema>;
@@ -62,7 +62,7 @@ export const GenerateHintOutputSchema = z.object({
 });
 export type GenerateHintOutput = z.infer<typeof GenerateHintOutputSchema>;
 
-// Schema for explaining an answer (updated)
+// Schema for explaining an answer
 export const ExplainAnswerInputSchema = z.object({
   question: z.string().describe('The quiz question.'),
   answer: z.string().describe('The user\'s answer to the question.'),
@@ -75,3 +75,29 @@ export const ExplainAnswerOutputSchema = z.object({
   explanation: z.string().describe('The AI tutor\'s explanation.'),
 });
 export type ExplainAnswerOutput = z.infer<typeof ExplainAnswerOutputSchema>;
+
+// Schema for Study Chatbot
+export const StudyChatInputSchema = z.object({
+  topic: z.string().describe('The topic the user wants to study.'),
+  // Omitting chatHistory for simpler first pass, can be added later.
+  // chatHistory: z.array(z.object({ role: z.enum(["user", "model"]), parts: z.array(z.object({text: z.string()})) })).optional().describe('The history of the conversation so far.'),
+  currentUserMessage: z.string().describe('The latest message from the user.'),
+});
+export type StudyChatInput = z.infer<typeof StudyChatInputSchema>;
+
+export const StudyChatOutputSchema = z.object({
+  aiResponseMessage: z.string().describe('The AI tutor\'s response message.'),
+});
+export type StudyChatOutput = z.infer<typeof StudyChatOutputSchema>;
+
+// Schema for Question Solver
+export const SolveQuestionInputSchema = z.object({
+  questionText: z.string().describe('The question text pasted by the user.'),
+});
+export type SolveQuestionInput = z.infer<typeof SolveQuestionInputSchema>;
+
+export const SolveQuestionOutputSchema = z.object({
+  solution: z.string().describe('The step-by-step solution to the question.'),
+  explanation: z.string().optional().describe('An optional additional explanation or context for the solution.'),
+});
+export type SolveQuestionOutput = z.infer<typeof SolveQuestionOutputSchema>;

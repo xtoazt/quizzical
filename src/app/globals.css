@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,18 +17,18 @@ body {
     --popover-foreground: 0 0% 13%; /* Dark Grey text */
     --primary: 207 90% 54%; /* Blue #2196F3 */
     --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 207 89% 77%; /* Lighter Blue #90CAF9 */
-    --secondary-foreground: 207 90% 40%; /* Darker Blue text for Lighter Blue bg */
-    --muted: 0 0% 90%; /* Slightly darker grey */
-    --muted-foreground: 0 0% 40%; /* Greyer text */
-    --accent: 0 0% 46%; /* Medium Grey #757575 */
+    --secondary: 207 89% 85%; /* Lighter Blue #B3E5FC - adjusted for more subtlety */
+    --secondary-foreground: 207 90% 30%; /* Darker Blue text for Lighter Blue bg */
+    --muted: 0 0% 92%; /* Slightly darker grey for muted backgrounds #EBEBEB */
+    --muted-foreground: 0 0% 35%; /* Greyer text #595959 */
+    --accent: 207 80% 60%; /* Slightly lighter blue for accents */
     --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 85%; /* Visible border on light grey */
+    --border: 0 0% 87%; /* Visible border on light grey #DEDEDE */
     --input: 0 0% 100%; /* White input background */
     --ring: 207 90% 54%; /* Blue for focus rings */
-    --chart-1: 207 80% 50%; /* Adjusted chart colors */
+    --chart-1: 207 80% 50%; 
     --chart-2: 207 70% 60%;
     --chart-3: 0 0% 50%;
     --chart-4: 207 60% 70%;
@@ -35,36 +36,36 @@ body {
     --radius: 0.5rem;
 
     /* Sidebar variables */
-    --sidebar-background: 0 0% 100%; /* White sidebar */
-    --sidebar-foreground: 0 0% 13%; /* Dark Grey text */
-    --sidebar-primary: 207 90% 54%; /* Blue */
-    --sidebar-primary-foreground: 0 0% 100%; /* White */
-    --sidebar-accent: 0 0% 46%; /* Medium Grey */
-    --sidebar-accent-foreground: 0 0% 100%; /* White */
-    --sidebar-border: 0 0% 85%;
+    --sidebar-background: 0 0% 100%; 
+    --sidebar-foreground: 0 0% 13%; 
+    --sidebar-primary: 207 90% 54%; 
+    --sidebar-primary-foreground: 0 0% 100%; 
+    --sidebar-accent: 207 80% 60%; 
+    --sidebar-accent-foreground: 0 0% 100%; 
+    --sidebar-border: 0 0% 87%;
     --sidebar-ring: 207 90% 54%;
   }
 
   .dark {
-    --background: 220 13% 10%; /* Dark blue-grey */
-    --foreground: 0 0% 96.1%; /* Light Grey text */
-    --card: 220 13% 13%; /* Darker card */
+    --background: 220 13% 10%; 
+    --foreground: 0 0% 96.1%; 
+    --card: 220 13% 13%; 
     --card-foreground: 0 0% 96.1%;
     --popover: 220 13% 13%;
     --popover-foreground: 0 0% 96.1%;
-    --primary: 207 80% 65%; /* Lighter Blue */
-    --primary-foreground: 220 13% 5%; /* Very Dark text for contrast */
-    --secondary: 220 13% 25%; /* Darker Lighter Blue-grey */
-    --secondary-foreground: 0 0% 96.1%;
-    --muted: 220 13% 20%; /* Darker muted */
-    --muted-foreground: 0 0% 60%;
-    --accent: 0 0% 60%; /* Lighter Grey for dark mode accent */
-    --accent-foreground: 0 0% 10%; /* Dark text for contrast */
+    --primary: 207 80% 65%; 
+    --primary-foreground: 220 13% 5%; 
+    --secondary: 220 13% 20%; /* Darker Lighter Blue-grey */
+    --secondary-foreground: 0 0% 90%;
+    --muted: 220 13% 16%; 
+    --muted-foreground: 0 0% 65%;
+    --accent: 207 70% 55%; 
+    --accent-foreground: 0 0% 10%; 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 25%;
     --input: 220 13% 20%;
-    --ring: 207 80% 65%; /* Lighter Blue for focus rings */
+    --ring: 207 80% 65%; 
     --chart-1: 207 70% 55%;
     --chart-2: 207 60% 65%;
     --chart-3: 0 0% 70%;
@@ -75,7 +76,7 @@ body {
     --sidebar-foreground: 0 0% 96.1%;
     --sidebar-primary: 207 80% 65%;
     --sidebar-primary-foreground: 220 13% 5%;
-    --sidebar-accent: 0 0% 60%;
+    --sidebar-accent: 207 70% 55%;
     --sidebar-accent-foreground: 0 0% 10%;
     --sidebar-border: 220 13% 25%;
     --sidebar-ring: 207 80% 65%;
@@ -88,5 +89,15 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Subtle button hover effect */
+@layer components {
+  .btn-subtle-hover {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  .btn-subtle-hover:hover {
+    @apply opacity-90 transform scale-[1.02];
   }
 }

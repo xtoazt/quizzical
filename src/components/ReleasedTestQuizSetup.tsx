@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,15 +12,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { handleGenerateReleasedTestQuizAction } from "@/lib/actions";
 import type { Quiz, GeneratedQuizQuestion, ReleasedTestQuizSetupFormValues } from "@/lib/types";
+import { releasedTestQuizSetupSchema } from "@/lib/types"; // Import schema from types
 import { BookMarked, Loader2 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-
-const releasedTestQuizSetupSchema = z.object({
-  county: z.string().min(3, "County/Region must be at least 3 characters long."),
-  unit: z.string().min(3, "Unit/Subject must be at least 3 characters long."),
-  numQuestions: z.coerce.number().min(1, "Number of questions must be at least 1.").max(100, "Max 100 questions."),
-});
-
 
 export function ReleasedTestQuizSetup() {
   const router = useRouter();
@@ -59,7 +52,7 @@ export function ReleasedTestQuizSetup() {
         toast({ title: "Quiz Generated!", description: `Your quiz based on released tests for "${values.unit}" is ready.` });
         router.push("/quiz");
       } else {
-        toast({ variant: "destructive", title: "Error", description: result.error || "Failed to generate quiz from released tests." });
+        toast({ variant: "destructive", title: "Generation Failed", description: result.error || "Failed to generate quiz from released tests." });
       }
     } catch (error) {
       toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
@@ -69,13 +62,13 @@ export function ReleasedTestQuizSetup() {
   };
 
   return (
-    <Card className="w-full shadow-xl">
+    <Card className="w-full shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardHeader>
         <CardTitle className="font-headline text-3xl text-center text-primary flex items-center justify-center gap-2">
           <BookMarked className="w-8 h-8" /> Create Quiz from Released Tests
         </CardTitle>
         <CardDescription className="text-center pt-2">
-          Enter a county/region and educational unit/subject to find questions (up to 100) from publicly available released tests. The AI may also include relevant images.
+          Enter a county/region and educational unit/subject to find questions (1-100) from publicly available released tests. The AI may also include relevant images.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -114,7 +107,9 @@ export function ReleasedTestQuizSetup() {
                 <FormItem>
                   <FormLabel>Number of Questions (approximate)</FormLabel>
                   <FormControl>
-                    <Input type="number" min="1" max="100" {...field} />
+                     <Input type="number" min="1" max="100" {...field} 
+                       onChange={e => field.onChange(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -122,7 +117,7 @@ export function ReleasedTestQuizSetup() {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full btn-subtle-hover" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

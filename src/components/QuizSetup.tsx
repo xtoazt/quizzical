@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { handleGenerateQuizAction } from "@/lib/actions";
 import type { Quiz, GeneratedQuizQuestion, QuizSetupFormValues } from "@/lib/types";
-import { quizSetupSchema } from "@/lib/types"; // Import schema from types
+import { quizSetupSchema } from "@/lib/types"; 
 import { Sparkles, Loader2 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
@@ -26,7 +26,7 @@ export function QuizSetup() {
     resolver: zodResolver(quizSetupSchema),
     defaultValues: {
       topic: "",
-      numQuestions: 10, // Default to 10
+      numQuestions: 10,
     },
   });
 
@@ -51,7 +51,7 @@ export function QuizSetup() {
         toast({ title: "Quiz Generated!", description: `Your quiz on "${values.topic}" is ready.` });
         router.push("/quiz");
       } else {
-        toast({ variant: "destructive", title: "Error", description: result.error || "Failed to generate quiz." });
+        toast({ variant: "destructive", title: "Generation Failed", description: result.error || "Failed to generate quiz." });
       }
     } catch (error) {
       toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
@@ -61,13 +61,13 @@ export function QuizSetup() {
   };
 
   return (
-    <Card className="w-full shadow-xl">
+    <Card className="w-full shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardHeader>
         <CardTitle className="font-headline text-3xl text-center text-primary flex items-center justify-center gap-2">
           <Sparkles className="w-8 h-8" /> Create Quiz by Topic
         </CardTitle>
         <CardDescription className="text-center pt-2">
-          Enter a topic and number of questions (up to 100) to generate a new quiz using AI.
+          Enter a topic and number of questions (1-100) to generate a new quiz using AI.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -93,7 +93,9 @@ export function QuizSetup() {
                 <FormItem>
                   <FormLabel>Number of Questions</FormLabel>
                   <FormControl>
-                    <Input type="number" min="1" max="100" {...field} />
+                    <Input type="number" min="1" max="100" {...field} 
+                      onChange={e => field.onChange(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -101,7 +103,7 @@ export function QuizSetup() {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full btn-subtle-hover" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
