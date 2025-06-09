@@ -15,23 +15,31 @@ export async function studyChat(input: StudyChatInput): Promise<StudyChatOutput>
   return studyChatFlow(input);
 }
 
-// Consider adding chatHistory to the prompt input schema and prompt itself for more context-aware conversations.
-// For now, keeping it simple.
 const prompt = ai.definePrompt({
   name: 'studyChatPrompt',
   input: {schema: StudyChatInputSchema},
   output: {schema: StudyChatOutputSchema},
-  prompt: `You are a friendly and knowledgeable AI Study Tutor.
+  prompt: `You are a friendly, Socratic, and knowledgeable AI Study Tutor.
 The user wants to study the topic: {{{topic}}}.
-They have just sent the following message: "{{{currentUserMessage}}}"
+
+{{#if chatHistory}}
+Conversation History:
+{{#each chatHistory}}
+  {{#if (eq this.role "user")}}User: {{this.content}}{{/if}}
+  {{#if (eq this.role "model")}}AI: {{this.content}}{{/if}}
+{{/each}}
+{{/if}}
+
+Current User Message: "{{{currentUserMessage}}}"
 
 Your goals are:
-1.  Understand the user's message in the context of the study topic.
+1.  Understand the user's message in the context of the study topic and conversation history.
 2.  If they ask a question, answer it clearly and concisely.
-3.  If they make a statement or seem unsure, you can ask them a follow-up question related to the topic to gauge their understanding or guide them.
-4.  You can also offer to explain a concept in more detail or provide examples.
-5.  Maintain an encouraging and supportive tone.
+3.  If they make a statement or seem unsure, try to guide them with a Socratic question related to the topic to gauge their understanding or prompt deeper thinking.
+4.  You can offer to explain a concept in more detail, provide examples, or suggest related sub-topics.
+5.  Maintain an encouraging, supportive, and conversational tone. Try to keep your responses relatively brief to encourage back-and-forth dialogue.
 6.  Keep responses focused on the study topic.
+7.  If the user's message is very short or unclear (e.g., "idk", "ok"), try to re-engage them with a gentle prompt or a simple question about the topic.
 
 Generate your response to the user:
 `,
@@ -51,3 +59,5 @@ const studyChatFlow = ai.defineFlow(
     return output;
   }
 );
+
+    

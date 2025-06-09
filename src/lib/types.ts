@@ -76,12 +76,18 @@ export const ExplainAnswerOutputSchema = z.object({
 });
 export type ExplainAnswerOutput = z.infer<typeof ExplainAnswerOutputSchema>;
 
+// Schema for a single chat message
+export const ChatMessageSchema = z.object({
+  role: z.enum(['user', 'model']),
+  content: z.string(),
+});
+export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+
 // Schema for Study Chatbot
 export const StudyChatInputSchema = z.object({
   topic: z.string().describe('The topic the user wants to study.'),
-  // Omitting chatHistory for simpler first pass, can be added later.
-  // chatHistory: z.array(z.object({ role: z.enum(["user", "model"]), parts: z.array(z.object({text: z.string()})) })).optional().describe('The history of the conversation so far.'),
-  currentUserMessage: z.string().describe('The latest message from the user.'),
+  chatHistory: z.array(ChatMessageSchema).optional().describe('The history of the conversation so far. The last message is the current user message.'),
+  currentUserMessage: z.string().describe('The latest message from the user (also included as the last message in chatHistory if history is provided).'),
 });
 export type StudyChatInput = z.infer<typeof StudyChatInputSchema>;
 
@@ -101,3 +107,5 @@ export const SolveQuestionOutputSchema = z.object({
   explanation: z.string().optional().describe('An optional additional explanation or context for the solution.'),
 });
 export type SolveQuestionOutput = z.infer<typeof SolveQuestionOutputSchema>;
+
+    

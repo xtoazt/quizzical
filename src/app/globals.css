@@ -8,78 +8,274 @@ body {
 }
 
 @layer base {
-  :root {
+  :root, .theme-blue {
     --background: 0 0% 96.1%; /* Light Grey #F5F5F5 */
     --foreground: 0 0% 13%; /* Dark Grey text #212121 */
     --card: 0 0% 100%; /* White */
-    --card-foreground: 0 0% 13%; /* Dark Grey text */
-    --popover: 0 0% 100%; /* White */
-    --popover-foreground: 0 0% 13%; /* Dark Grey text */
+    --card-foreground: 0 0% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
     --primary: 207 90% 54%; /* Blue #2196F3 */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 207 89% 85%; /* Lighter Blue #B3E5FC - adjusted for more subtlety */
-    --secondary-foreground: 207 90% 30%; /* Darker Blue text for Lighter Blue bg */
-    --muted: 0 0% 92%; /* Slightly darker grey for muted backgrounds #EBEBEB */
-    --muted-foreground: 0 0% 35%; /* Greyer text #595959 */
-    --accent: 207 80% 60%; /* Slightly lighter blue for accents */
-    --accent-foreground: 0 0% 100%; /* White */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 207 89% 85%; /* Lighter Blue #B3E5FC */
+    --secondary-foreground: 207 90% 30%;
+    --muted: 0 0% 92%; /* #EBEBEB */
+    --muted-foreground: 0 0% 35%; /* #595959 */
+    --accent: 173 58% 50%; /* Teal #009688 - QuizzicalAI Accent */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 87%; /* Visible border on light grey #DEDEDE */
-    --input: 0 0% 100%; /* White input background */
+    --border: 0 0% 87%; /* #DEDEDE */
+    --input: 0 0% 100%;
     --ring: 207 90% 54%; /* Blue for focus rings */
-    --chart-1: 207 80% 50%; 
-    --chart-2: 207 70% 60%;
+    --chart-1: 207 80% 50%;
+    --chart-2: 173 70% 40%;
     --chart-3: 0 0% 50%;
     --chart-4: 207 60% 70%;
-    --chart-5: 0 0% 60%;
+    --chart-5: 173 50% 60%;
     --radius: 0.5rem;
 
-    /* Sidebar variables */
-    --sidebar-background: 0 0% 100%; 
-    --sidebar-foreground: 0 0% 13%; 
-    --sidebar-primary: 207 90% 54%; 
-    --sidebar-primary-foreground: 0 0% 100%; 
-    --sidebar-accent: 207 80% 60%; 
-    --sidebar-accent-foreground: 0 0% 100%; 
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 13%;
+    --sidebar-primary: 207 90% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 173 58% 50%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 87%;
     --sidebar-ring: 207 90% 54%;
   }
 
-  .dark {
-    --background: 220 13% 10%; 
-    --foreground: 0 0% 96.1%; 
-    --card: 220 13% 13%; 
+  .dark.theme-blue {
+    --background: 220 13% 10%;
+    --foreground: 0 0% 96.1%;
+    --card: 220 13% 13%;
     --card-foreground: 0 0% 96.1%;
     --popover: 220 13% 13%;
     --popover-foreground: 0 0% 96.1%;
-    --primary: 207 80% 65%; 
-    --primary-foreground: 220 13% 5%; 
-    --secondary: 220 13% 20%; /* Darker Lighter Blue-grey */
+    --primary: 207 80% 65%;
+    --primary-foreground: 220 13% 5%;
+    --secondary: 220 13% 20%;
     --secondary-foreground: 0 0% 90%;
-    --muted: 220 13% 16%; 
+    --muted: 220 13% 16%;
     --muted-foreground: 0 0% 65%;
-    --accent: 207 70% 55%; 
-    --accent-foreground: 0 0% 10%; 
+    --accent: 173 50% 60%; /* Teal Accent */
+    --accent-foreground: 0 0% 10%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 25%;
     --input: 220 13% 20%;
-    --ring: 207 80% 65%; 
+    --ring: 207 80% 65%;
     --chart-1: 207 70% 55%;
-    --chart-2: 207 60% 65%;
+    --chart-2: 173 60% 50%;
     --chart-3: 0 0% 70%;
     --chart-4: 207 50% 75%;
-    --chart-5: 0 0% 80%;
+    --chart-5: 173 40% 70%;
 
     --sidebar-background: 220 13% 8%;
     --sidebar-foreground: 0 0% 96.1%;
     --sidebar-primary: 207 80% 65%;
     --sidebar-primary-foreground: 220 13% 5%;
-    --sidebar-accent: 207 70% 55%;
+    --sidebar-accent: 173 50% 60%;
     --sidebar-accent-foreground: 0 0% 10%;
     --sidebar-border: 220 13% 25%;
     --sidebar-ring: 207 80% 65%;
+  }
+
+  /* QuizzicalAI Theme (Deep Purple) */
+  .theme-purple {
+    --background: 0 0% 96.1%; /* Light Grey #F5F5F5 */
+    --foreground: 0 0% 13%;   /* Dark Grey text #212121 */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+    --primary: 267 58% 50%; /* Deep Purple #673AB7 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 267 50% 88%; /* Lighter Purple */
+    --secondary-foreground: 267 58% 25%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 35%;
+    --accent: 173 58% 50%; /* Teal #009688 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 87%;
+    --input: 0 0% 100%;
+    --ring: 267 58% 50%;
+    --chart-1: 267 50% 55%;
+    --chart-2: 173 50% 45%;
+  }
+
+  .dark.theme-purple {
+    --background: 267 20% 12%; /* Darker Purple variant */
+    --foreground: 0 0% 96.1%;
+    --card: 267 20% 15%;
+    --card-foreground: 0 0% 96.1%;
+    --popover: 267 20% 15%;
+    --popover-foreground: 0 0% 96.1%;
+    --primary: 267 60% 65%; /* Lighter Deep Purple for dark */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 267 30% 25%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 267 20% 20%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 173 55% 60%; /* Teal for dark */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 267 15% 30%;
+    --input: 267 20% 22%;
+    --ring: 267 60% 65%;
+    --chart-1: 267 50% 60%;
+    --chart-2: 173 50% 55%;
+  }
+
+  /* Green Theme */
+  .theme-green {
+    --background: 0 0% 96.1%;
+    --foreground: 0 0% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+    --primary: 145 63% 42%; /* Green */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 145 50% 88%; /* Lighter Green */
+    --secondary-foreground: 145 63% 20%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 35%;
+    --accent: 45 100% 50%; /* Yellow/Gold */
+    --accent-foreground: 0 0% 13%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 87%;
+    --input: 0 0% 100%;
+    --ring: 145 63% 42%;
+    --chart-1: 145 55% 45%;
+    --chart-2: 45 80% 55%;
+  }
+
+  .dark.theme-green {
+    --background: 145 20% 12%;
+    --foreground: 0 0% 96.1%;
+    --card: 145 20% 15%;
+    --card-foreground: 0 0% 96.1%;
+    --popover: 145 20% 15%;
+    --popover-foreground: 0 0% 96.1%;
+    --primary: 145 55% 55%; /* Lighter Green for dark */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 145 30% 25%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 145 20% 20%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 45 80% 60%; /* Yellow/Gold for dark */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 145 15% 30%;
+    --input: 145 20% 22%;
+    --ring: 145 55% 55%;
+    --chart-1: 145 50% 50%;
+    --chart-2: 45 70% 50%;
+  }
+
+  /* Mocha Theme */
+  .theme-mocha {
+    --background: 30 25% 94%; /* Creamy Beige */
+    --foreground: 30 10% 25%; /* Dark Brown */
+    --card: 30 20% 98%;
+    --card-foreground: 30 10% 25%;
+    --popover: 30 20% 98%;
+    --popover-foreground: 30 10% 25%;
+    --primary: 30 40% 45%; /* Medium Brown (Mocha) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 30% 85%; /* Light Mocha */
+    --secondary-foreground: 30 40% 25%;
+    --muted: 30 20% 90%;
+    --muted-foreground: 30 10% 40%;
+    --accent: 180 40% 40%; /* Soft Teal/Aqua */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 15% 80%;
+    --input: 30 20% 98%;
+    --ring: 30 40% 45%;
+    --chart-1: 30 35% 50%;
+    --chart-2: 180 35% 45%;
+  }
+
+  .dark.theme-mocha {
+    --background: 30 15% 12%; /* Dark Brown */
+    --foreground: 30 15% 85%; /* Light Cream */
+    --card: 30 15% 15%;
+    --card-foreground: 30 15% 85%;
+    --popover: 30 15% 15%;
+    --popover-foreground: 30 15% 85%;
+    --primary: 30 35% 65%; /* Lighter Mocha for dark */
+    --primary-foreground: 30 10% 10%;
+    --secondary: 30 20% 25%;
+    --secondary-foreground: 30 15% 80%;
+    --muted: 30 15% 20%;
+    --muted-foreground: 30 10% 60%;
+    --accent: 180 30% 55%; /* Soft Teal/Aqua for dark */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 50% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30 10% 30%;
+    --input: 30 15% 22%;
+    --ring: 30 35% 65%;
+    --chart-1: 30 30% 60%;
+    --chart-2: 180 30% 50%;
+  }
+
+  /* Monochrome Light Theme */
+  .theme-mono-light {
+    --background: 0 0% 100%; /* White */
+    --foreground: 0 0% 13%;   /* Dark Grey */
+    --card: 0 0% 96%; /* Off-white */
+    --card-foreground: 0 0% 13%;
+    --popover: 0 0% 96%;
+    --popover-foreground: 0 0% 13%;
+    --primary: 0 0% 20%;   /* Dark Grey */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 0 0% 90%; /* Light Grey */
+    --secondary-foreground: 0 0% 20%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 35%;
+    --accent: 0 0% 30%; /* Medium Grey */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 85%;
+    --input: 0 0% 98%;
+    --ring: 0 0% 20%;
+    --chart-1: 0 0% 40%;
+    --chart-2: 0 0% 60%;
+  }
+
+  /* Monochrome Dark Theme */
+  .dark.theme-mono-dark, .theme-mono-dark { /* Allow .theme-mono-dark to work without .dark if system is light */
+    --background: 0 0% 10%; /* Near Black */
+    --foreground: 0 0% 90%; /* Light Grey */
+    --card: 0 0% 15%;   /* Darker Grey */
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 90%;
+    --primary: 0 0% 85%; /* Light Grey */
+    --primary-foreground: 0 0% 10%; /* Near Black */
+    --secondary: 0 0% 25%; /* Medium-Dark Grey */
+    --secondary-foreground: 0 0% 85%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 70%; /* Medium-Light Grey */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 30%;
+    --input: 0 0% 22%;
+    --ring: 0 0% 85%;
+    --chart-1: 0 0% 60%;
+    --chart-2: 0 0% 40%;
   }
 }
 
@@ -101,3 +297,5 @@ body {
     @apply opacity-90 transform scale-[1.02];
   }
 }
+
+    

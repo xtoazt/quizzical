@@ -7,7 +7,7 @@ import { generateReleasedTestQuiz, type GenerateReleasedTestQuizInput } from "@/
 import { generateHint, type GenerateHintInput, type GenerateHintOutput } from "@/ai/flows/generate-hint";
 import { studyChat, type StudyChatInput, type StudyChatOutput } from "@/ai/flows/study-chat-flow";
 import { solveQuestion, type SolveQuestionInput, type SolveQuestionOutput } from "@/ai/flows/solve-question-flow";
-import type { GenerateQuizOutput } from "@/lib/types";
+import type { GenerateQuizOutput, ChatMessage } from "@/lib/types"; // Added ChatMessage
 import { z } from "zod";
 
 export async function handleGenerateQuizAction(
@@ -93,9 +93,10 @@ export async function handleGetHintAction(
 
 export async function handleStudyChatMessageAction(
   topic: string,
-  currentUserMessage: string
+  currentUserMessage: string,
+  chatHistory?: ChatMessage[] // Added chatHistory
 ): Promise<{ success: boolean; data?: StudyChatOutput; error?: string }> {
-  const input: StudyChatInput = { topic, currentUserMessage };
+  const input: StudyChatInput = { topic, currentUserMessage, chatHistory };
   try {
     const result = await studyChat(input);
     if (result && result.aiResponseMessage) {
@@ -125,3 +126,5 @@ export async function handleSolveQuestionAction(
     return { success: false, error: "An unexpected error occurred while solving the question." };
   }
 }
+
+    
