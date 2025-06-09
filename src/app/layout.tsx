@@ -1,5 +1,5 @@
 
-"use client"; 
+"use client";
 
 import { useEffect, useState } from 'react';
 import './globals.css';
@@ -12,6 +12,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 // Helper function to apply theme
 function applyThemeToDocument(themeValue: string | null) {
+  if (typeof window === 'undefined') return; // Ensure this only runs client-side
   const root = window.document.documentElement;
   const baseThemes = ['theme-blue', 'theme-purple', 'theme-green', 'theme-mocha', 'theme-mono-light', 'theme-mono-dark'];
   root.classList.remove(...baseThemes, 'dark');
@@ -49,14 +50,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [mounted, setMounted] = useState(false);
-  const [theme] = useLocalStorage<string>('theme', 'system');
+  const [theme, setThemeInStorage] = useLocalStorage<string>('theme', 'system'); // Renamed to avoid conflict
   const [userName, setUserName] = useLocalStorage<string | null>('quizzicalai_userName', null);
   const [isNamePromptOpen, setIsNamePromptOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   useEffect(() => {
     if (mounted) {
       applyThemeToDocument(theme);
@@ -75,7 +76,8 @@ export default function RootLayout({
 
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'theme' && event.newValue) {
-        applyThemeToDocument(event.newValue);
+        // Update the theme state which will trigger the applyThemeToDocument effect
+        setThemeInStorage(event.newValue);
       }
       if (event.key === 'quizzicalai_userName' && event.newValue) {
         setUserName(event.newValue ? JSON.parse(event.newValue) : null);
@@ -85,16 +87,18 @@ export default function RootLayout({
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [mounted, setUserName]);
+  }, [mounted, setUserName, setThemeInStorage]);
   
-  if (!mounted) {
-      return null; 
-  }
 
   const handleNameSave = (name: string) => {
     setUserName(name);
     setIsNamePromptOpen(false);
   };
+
+  // The RootLayout must always return <html> and <body> tags.
+  // The `if (!mounted) { return null; }` check was removed.
+  // Client-side only logic (like dialogs or theme application) is handled
+  // within useEffect or by conditional rendering *inside* the body.
 
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
@@ -105,13 +109,20 @@ export default function RootLayout({
         {/* For now, I will not add a placeholder favicon as I cannot generate image files */}
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
+        {/* Conditionally render children or a loader based on 'mounted' if necessary,
+            but the main structure must always be present.
+            For now, just rendering children directly is fine, hydration warnings are suppressed.
+        */}
         {children}
         <Toaster />
-        <UserNamePromptDialog 
-          isOpen={isNamePromptOpen} 
-          onClose={() => setIsNamePromptOpen(false)} // Or handle it differently if name is mandatory
-          onSave={handleNameSave} 
-        />
+        {/* UserNamePromptDialog is client-side, its visibility is controlled by state */}
+        {mounted && (
+            <UserNamePromptDialog
+                isOpen={isNamePromptOpen}
+                onClose={() => setIsNamePromptOpen(false)}
+                onSave={handleNameSave}
+            />
+        )}
       </body>
     </html>
   );
