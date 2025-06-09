@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,29 +11,33 @@ import { Loader2 } from "lucide-react";
 
 export default function QuizPage() {
   const router = useRouter();
-  const [quizData, setQuizData] = useLocalStorage<Quiz | null>("quizzicalai_currentQuiz", null);
-  const [isLoading, setIsLoading] = useState(true);
+  // quizDataFromHook is initialized by useLocalStorage.
+  // It will be null initially, then updated from localStorage by the hook's internal useEffect.
+  const [quizDataFromHook] = useLocalStorage<Quiz | null>("quizzicalai_currentQuiz", null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    const storedQuiz = localStorage.getItem("quizzicalai_currentQuiz");
-    if (storedQuiz) {
-      try {
-        const parsedQuiz = JSON.parse(storedQuiz);
-         // Check if it's a valid quiz structure (basic check)
-        if (parsedQuiz && parsedQuiz.questions && parsedQuiz.topic) {
-          setQuizData(parsedQuiz);
-        } else {
-           router.replace("/"); // Invalid quiz data
-        }
-      } catch (error) {
-        console.error("Failed to parse quiz data from localStorage", error);
-        router.replace("/"); // Error parsing, redirect
+    // This ensures that any logic relying on client-side features runs after mount.
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    // This effect runs when isClient becomes true, or when quizDataFromHook changes.
+    // It handles redirection if quiz data is invalid after the initial load attempt.
+    if (isClient) {
+      if (quizDataFromHook && quizDataFromHook.questions && quizDataFromHook.questions.length > 0 && quizDataFromHook.topic) {
+        // Quiz data is valid and loaded.
+      } else {
+        // Quiz data is not valid (null, empty questions, etc.) after initial load attempt from localStorage.
+        router.replace("/");
       }
-    } else if (!quizData) { // If nothing in localStorage and quizData hook also null
-        router.replace("/"); // No quiz data, redirect
     }
-    setIsLoading(false);
-  }, [router, setQuizData, quizData]); // Added quizData to dependency array
+  }, [isClient, quizDataFromHook, router]);
+
+  // isLoading is true if we are not yet on the client (hydration phase)
+  // or if quizDataFromHook is still null (implying it hasn't loaded or isn't in LS).
+  // If isClient is true and quizDataFromHook is null, the effect above will redirect.
+  const isLoading = !isClient; 
 
   if (isLoading) {
     return (
@@ -45,14 +50,15 @@ export default function QuizPage() {
     );
   }
   
-  if (!quizData || !quizData.questions || quizData.questions.length === 0) {
-    // This case should ideally be caught by useEffect redirecting, but as a fallback:
-     useEffect(() => { router.replace("/"); }, [router]);
+  // If not loading, and we are here, the useEffect above should have handled redirection
+  // if quizDataFromHook was invalid. This is an additional safeguard or handles the
+  // brief moment before redirection completes.
+  if (!quizDataFromHook || !quizDataFromHook.questions || quizDataFromHook.questions.length === 0) {
     return (
         <>
             <AppHeader />
             <main className="flex-grow flex items-center justify-center">
-                <p>No quiz found. Redirecting...</p>
+                <p>Loading quiz data or redirecting...</p>
             </main>
         </>
     );
@@ -62,7 +68,7 @@ export default function QuizPage() {
     <>
       <AppHeader />
       <main className="flex-grow flex flex-col">
-        <QuizPlayer initialQuiz={quizData} />
+        <QuizPlayer initialQuiz={quizDataFromHook} />
       </main>
     </>
   );

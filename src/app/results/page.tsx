@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,30 +11,27 @@ import { Loader2 } from "lucide-react";
 
 export default function ResultsPage() {
   const router = useRouter();
-  // Use quizData from localStorage, which should include userAnswers and isCorrect flags
-  const [quizData, setQuizData] = useLocalStorage<Quiz | null>("quizzicalai_currentQuiz", null);
-  const [isLoading, setIsLoading] = useState(true);
+  // quizDataFromHook is initialized by useLocalStorage.
+  const [quizDataFromHook] = useLocalStorage<Quiz | null>("quizzicalai_currentQuiz", null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    const storedQuiz = localStorage.getItem("quizzicalai_currentQuiz");
-     if (storedQuiz) {
-      try {
-        const parsedQuiz = JSON.parse(storedQuiz);
-        // Check if it's a valid quiz structure with results
-        if (parsedQuiz && parsedQuiz.questions && parsedQuiz.questions.some((q:any) => typeof q.isCorrect !== 'undefined')) {
-          setQuizData(parsedQuiz);
-        } else {
-          router.replace("/"); // Invalid or incomplete quiz data for results
-        }
-      } catch (error) {
-        console.error("Failed to parse quiz results from localStorage", error);
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      // Check if it's a valid quiz structure with results
+      if (quizDataFromHook && quizDataFromHook.questions && quizDataFromHook.questions.some((q: any) => typeof q.isCorrect !== 'undefined')) {
+        // Valid quiz results are loaded.
+      } else {
+        // Invalid or incomplete quiz data for results page.
         router.replace("/");
       }
-    } else if (!quizData || !quizData.questions.some(q => typeof q.isCorrect !== 'undefined')) {
-        router.replace("/"); // No quiz data for results
     }
-    setIsLoading(false);
-  }, [router, setQuizData, quizData]);
+  }, [isClient, quizDataFromHook, router]);
+
+  const isLoading = !isClient;
 
   if (isLoading) {
     return (
@@ -46,14 +44,12 @@ export default function ResultsPage() {
     );
   }
 
-  if (!quizData || !quizData.questions || quizData.questions.length === 0 || !quizData.questions.some(q => typeof q.isCorrect !== 'undefined')) {
-    // This case should ideally be caught by useEffect redirecting, but as a fallback:
-    useEffect(() => { router.replace("/"); }, [router]);
+  if (!quizDataFromHook || !quizDataFromHook.questions || quizDataFromHook.questions.length === 0 || !quizDataFromHook.questions.some(q => typeof q.isCorrect !== 'undefined')) {
     return (
         <>
             <AppHeader />
             <main className="flex-grow flex items-center justify-center">
-                <p>No quiz results found. Redirecting...</p>
+                <p>No quiz results found or data is invalid. Redirecting...</p>
             </main>
         </>
     );
@@ -63,7 +59,7 @@ export default function ResultsPage() {
     <>
       <AppHeader />
       <main className="flex-grow flex flex-col">
-        <QuizResultDisplay quizResults={quizData} />
+        <QuizResultDisplay quizResults={quizDataFromHook} />
       </main>
     </>
   );
