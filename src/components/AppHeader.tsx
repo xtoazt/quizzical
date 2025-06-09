@@ -11,36 +11,42 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useLocalStorage } from '@/hooks/useLocalStorage'; // Assuming you have this hook
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useEffect } from 'react';
 
-// Helper function to apply theme (can be moved to a util if used elsewhere)
-function applyUpdatedTheme(theme: string) {
+// Helper function to apply theme
+function applyUpdatedTheme(themeValue: string) {
   const root = window.document.documentElement;
-  const themes = ['theme-blue', 'theme-purple', 'theme-green', 'theme-mocha', 'theme-mono-light', 'theme-mono-dark'];
-  root.classList.remove(...themes, 'dark');
+  // Define all base theme names that are applied as classes
+  const baseThemes = ['theme-blue', 'theme-purple', 'theme-green', 'theme-mocha', 'theme-mono-light', 'theme-mono-dark'];
+  // Remove all base themes and the main 'dark' class to start fresh
+  root.classList.remove(...baseThemes, 'dark');
 
-  if (theme === 'system') {
+  if (themeValue === 'system') {
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (systemPrefersDark) {
       root.classList.add('dark');
-      root.classList.add('theme-blue'); // Default dark theme
+      root.classList.add('theme-blue'); // Default system dark theme base
     } else {
-      root.classList.add('theme-blue'); // Default light theme
+      root.classList.add('theme-blue'); // Default system light theme base
     }
   } else {
-    root.classList.add(theme);
-    // Check if the selected theme is a dark variant and apply .dark class
-    // This logic assumes dark themes contain "dark" in their name or are handled by their CSS
-    if (theme === 'theme-mono-dark' || theme === 'dark.theme-blue' || theme === 'dark.theme-purple' || theme === 'dark.theme-green' || theme === 'dark.theme-mocha' ) {
-        // The specific theme class already implies dark mode through its CSS definition (e.g. .dark.theme-x or .theme-mono-dark)
-        // but we also need the global .dark for other shadcn/tailwind dark mode styles to work
-        root.classList.add('dark');
-    }
-     // Ensure specific dark themes like theme-mono-dark apply the .dark class
-    if (theme.startsWith('theme-mono-dark') || theme.endsWith('-dark')) { // A more generic check
-      if (!root.classList.contains('dark')) {
-        root.classList.add('dark');
+    // themeValue could be "theme-purple" (light), "dark theme-blue" (dark), or "theme-mono-dark" (dark by itself)
+    
+    if (themeValue.includes('dark')) { // True for "dark theme-blue" and "theme-mono-dark"
+      root.classList.add('dark'); // Apply the global .dark class
+      
+      // Extract the base theme name.
+      // For "dark theme-blue", themeName becomes "theme-blue".
+      // For "theme-mono-dark", themeName remains "theme-mono-dark" (as replace does nothing).
+      const themeName = themeValue.replace('dark ', ''); 
+      if (baseThemes.includes(themeName)) { // Ensure it's a known base theme
+        root.classList.add(themeName);
+      }
+    } else { 
+      // This is for light themes like "theme-blue", "theme-purple", "theme-mono-light"
+      if (baseThemes.includes(themeValue)) { // Ensure it's a known base theme
+         root.classList.add(themeValue);
       }
     }
   }
@@ -137,5 +143,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
