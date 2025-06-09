@@ -6,7 +6,7 @@ export const GeneratedQuizQuestionSchema = z.object({
   question: z.string().describe('The quiz question.'),
   options: z.array(z.string()).describe('The possible answers to the question.'),
   correctAnswer: z.string().describe('The correct answer to the question.'),
-  imageUrl: z.string().url().optional().describe('Optional URL of an image relevant to the question (e.g., a chart or diagram).'),
+  imageUrl: z.string().optional().describe('Optional URL of an image relevant to the question (e.g., a chart or diagram). This may not always be a strictly valid URL if the AI provides a descriptive placeholder.'),
   imageDescription: z.string().optional().describe('Optional description of the image if URL is not available or for accessibility.'),
 });
 export type GeneratedQuizQuestion = z.infer<typeof GeneratedQuizQuestionSchema>;
@@ -60,3 +60,4 @@ export const GenerateHintOutputSchema = z.object({
   hint: z.string(),
 });
 export type GenerateHintOutput = z.infer<typeof GenerateHintOutputSchema>;
+
